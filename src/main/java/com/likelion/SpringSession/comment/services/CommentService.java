@@ -7,6 +7,9 @@ import com.likelion.SpringSession.comment.entity.Comment;
 import com.likelion.SpringSession.comment.repository.CommentRepository;
 import com.likelion.SpringSession.post.entity.Post;
 import com.likelion.SpringSession.post.repository.PostRepository;
+import com.likelion.SpringSession.user.entity.User;
+import com.likelion.SpringSession.user.exception.UserNotFoundException;
+import com.likelion.SpringSession.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +24,7 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
     /**
      * Comment 작성
@@ -30,13 +34,22 @@ public class CommentService {
      */
     @Transactional
     public CommentResponse addComment(
+            Long userId,
             Long postId,
             CommentCreateRequest request
     ) {
         Post post = postRepository.findById(postId)
                 .orElseThrow();
 
-        Comment saved = commentRepository.save(new Comment(post, request.getContent()));
+        User author = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
+        Comment saved = commentRepository.save(new Comment(
+                author,
+                post,
+                request.getContent()
+        ));
+
         return new CommentResponse(saved);
     }
 

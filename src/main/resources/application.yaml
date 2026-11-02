@@ -6,6 +6,7 @@ spring:
     username: likelion
     password: ${DB_PASSWORD}
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: update
     show-sql: true
@@ -14,3 +15,7 @@ spring:
         format_sql: true
         hbm2ddl:
           import_files_sql_extractor: multi-line
+jwt:
+  secret:  ${JWT_SECRET}
+  access-token-validity: 1800000        # 30분  (밀리초)
+  refresh-token-validity: 1209600000    # 14일  (Part 6에서 씁니다)

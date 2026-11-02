@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,10 +28,15 @@ public class CommentController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CommentResponse create(
+            @AuthenticationPrincipal Long userId,
             @PathVariable("postId") Long postId,
             @Valid @RequestBody CommentCreateRequest request
     ) {
-        return commentService.addComment(postId, request);
+        return commentService.addComment(
+                userId,
+                postId,
+                request
+        );
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.likelion.SpringSession.comment.entity;
 
 import com.likelion.SpringSession.post.entity.Post;
+import com.likelion.SpringSession.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -16,6 +17,10 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)              // ← 추가
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author;
+
     @Column(nullable = false, length = 500)
     private String content;
 
@@ -26,11 +31,20 @@ public class Comment {
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    public Comment(Post post, String content) {
+    public Comment(
+            User author,
+            Post post,
+            String content
+    ) {
+        this.author = author;
         this.post = post;
         this.content = content;
         this.createdAt = LocalDateTime.now();
         post.getComments().add(this); // 반대쪽에 나를 추가
+    }
+
+    public boolean isAuthor(Long userId) {
+        return this.author.getId().equals(userId);
     }
 
     public void update(String content) {

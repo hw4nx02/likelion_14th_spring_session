@@ -1,6 +1,7 @@
 package com.likelion.SpringSession.post.entity;
 
 import com.likelion.SpringSession.comment.entity.Comment;
+import com.likelion.SpringSession.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -29,13 +30,22 @@ public class Post {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)              // ← 추가
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
-    public Post(String title, String content) {
+    public Post(User author, String title, String content) {
+        this.author = author;
         this.title = title;
         this.content = content;
         this.createAt = LocalDateTime.now();
+    }
+
+    public boolean isAuthor(Long userId) {
+        return this.author.getId().equals(userId);
     }
 
     public void update(String title, String content) {

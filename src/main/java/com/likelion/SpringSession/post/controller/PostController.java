@@ -7,6 +7,7 @@ import com.likelion.SpringSession.post.dto.PostUpdateRequest;
 import com.likelion.SpringSession.post.service.PostService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,24 +36,27 @@ public class PostController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED) // 201
     public PostDetailResponse createPost( // @Valid를 통해서 입력 인자 검증 -> 틀리면 400
-            @Valid @RequestBody PostCreateRequest request
+        @AuthenticationPrincipal Long userId,
+        @Valid @RequestBody PostCreateRequest request
     ) {
-        return postService.createPost(request);
+        return postService.createPost(userId, request);
     }
 
     @PutMapping("/{postId}")
     public PostDetailResponse updatePost(
+            @AuthenticationPrincipal Long userId,
             @PathVariable("postId") Long postId,
             @Valid @RequestBody PostUpdateRequest request
     ) {
-        return postService.updatePost(postId, request);
+        return postService.updatePost(userId, postId, request);
     }
 
     @DeleteMapping("/{postId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePost(
+            @AuthenticationPrincipal Long userId,
             @PathVariable("postId") Long postId
     ) {
-        postService.deletePost(postId);
+        postService.deletePost(userId, postId);
     }
 }
