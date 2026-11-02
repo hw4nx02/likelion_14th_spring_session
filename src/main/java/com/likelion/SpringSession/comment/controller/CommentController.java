@@ -54,24 +54,21 @@ public class CommentController {
     @PutMapping("/{commentId}")
     @ResponseStatus(HttpStatus.OK)
     public CommentResponse editComment(
+            @AuthenticationPrincipal Long userId,
             @PathVariable("postId") Long postId,
             @PathVariable("commentId") Long commentId,
             @Valid @RequestBody CommentUpdateRequest request
     ) throws Exception {
-        return commentService.editComment(postId, commentId, request);
+        return commentService.editComment(userId, postId, commentId, request);
     }
 
     @DeleteMapping("/{commentId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteComment(
+            @AuthenticationPrincipal Long userId,
             @PathVariable("postId") Long postId,
             @PathVariable("commentId") Long commentId
     ) throws Exception {
-        commentService.deleteComment(postId, commentId);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleException(Exception e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
+        commentService.deleteComment(userId, postId, commentId);
     }
 }

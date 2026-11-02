@@ -4,6 +4,7 @@ import com.likelion.SpringSession.comment.dto.CommentCreateRequest;
 import com.likelion.SpringSession.comment.dto.CommentResponse;
 import com.likelion.SpringSession.comment.dto.CommentUpdateRequest;
 import com.likelion.SpringSession.comment.entity.Comment;
+import com.likelion.SpringSession.comment.exception.CommentAccessDeniedException;
 import com.likelion.SpringSession.comment.repository.CommentRepository;
 import com.likelion.SpringSession.post.entity.Post;
 import com.likelion.SpringSession.post.repository.PostRepository;
@@ -79,14 +80,16 @@ public class CommentService {
      */
     @Transactional
     public CommentResponse editComment(
+            Long userId,
             Long postId,
             Long commentId,
             CommentUpdateRequest request
     ) throws Exception {
-        if (!isValidComment(postId, commentId)) {
-            throw new Exception("유효하지 않은 접근입니다.");
-        }
+        if (!isValidComment(postId, commentId)) { throw new Exception("유효하지 않은 접근입니다."); }
         Comment comment = findCommentById(commentId);
+
+        // 접근한 사용자 권한 확인
+        if (!comment.isAuthor(userId)) { throw new CommentAccessDeniedException(); }
 
         comment.update(
                 request.getContent()
@@ -97,13 +100,15 @@ public class CommentService {
 
     @Transactional
     public void deleteComment(
+            Long userId,
             Long postId,
             Long commentId
     ) throws Exception {
-        if (!isValidComment(postId, commentId)) {
-            throw new Exception("유효하지 않은 접근입니다.");
-        }
+        if (!isValidComment(postId, commentId)) { throw new Exception("유효하지 않은 접근입니다."); }
         Comment comment = findCommentById(commentId);
+        // 접근한 사용자 권한 검사
+        if (!comment.isAuthor(userId)) { throw new CommentAccessDeniedException(); }
+
         commentRepository.delete(comment);
     }
 

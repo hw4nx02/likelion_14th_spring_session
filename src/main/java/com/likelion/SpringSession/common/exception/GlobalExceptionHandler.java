@@ -3,6 +3,7 @@ package com.likelion.SpringSession.common.exception;
 import com.likelion.SpringSession.auth.exception.DuplicateEmailException;
 import com.likelion.SpringSession.auth.exception.InvalidCredentialsException;
 import com.likelion.SpringSession.auth.exception.InvalidRefreshTokenException;
+import com.likelion.SpringSession.comment.exception.CommentAccessDeniedException;
 import com.likelion.SpringSession.post.exception.PostAccessDeniedException;
 import com.likelion.SpringSession.user.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -25,27 +26,23 @@ public class GlobalExceptionHandler {
                 .getDefaultMessage();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new com.likelion.SpringSession.common.dto.ErrorResponse(400, message));
-    }
-
-    @ExceptionHandler(DuplicateEmailException.class)
-    public ResponseEntity<ErrorResponse> handleDuplicateEmail(
-            DuplicateEmailException e
-    ) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new ErrorResponse(409, e.getMessage()));
+                .body(new ErrorResponse(400, message));
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidCredentials(InvalidCredentialsException e) {
+    public ResponseEntity<ErrorResponse> handleInvalidCredentials(
+            InvalidCredentialsException e
+    ) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new ErrorResponse(401, e.getMessage()));
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorResponse(404, e.getMessage()));
+    @ExceptionHandler(InvalidRefreshTokenException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidRefreshToken(
+            InvalidRefreshTokenException e
+    ) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorResponse(401, e.getMessage()));
     }
 
     @ExceptionHandler(PostAccessDeniedException.class)
@@ -56,11 +53,27 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse(403, e.getMessage()));
     }
 
-    @ExceptionHandler(InvalidRefreshTokenException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidRefreshToken(
-            InvalidRefreshTokenException e
+    @ExceptionHandler(CommentAccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleCommentAccessDenied(
+            CommentAccessDeniedException e
     ) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new ErrorResponse(401, e.getMessage()));
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ErrorResponse(403, e.getMessage()));
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFound(
+            UserNotFoundException e
+    ) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(404, e.getMessage()));
+    }
+
+    @ExceptionHandler(DuplicateEmailException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateEmail(
+            DuplicateEmailException e
+    ) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse(409, e.getMessage()));
     }
 }
